@@ -6,7 +6,8 @@
         var config = {
             el: $("#canvas-container"),
             width: 500,
-            height: 500
+            height: 500,
+            nodeR: 20
         };
 
         new app.AppView(config);

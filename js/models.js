@@ -6,7 +6,13 @@
     });
 
     var Nodes = Backbone.Collection.extend({
-        model: Node
+        model: Node,
+
+        findByTarget: function (target) {
+            this.find(function (node) {
+                return node.el.node === target;
+            });
+        }
     });
 
     /* Edge Model 
@@ -15,8 +21,18 @@
     to      : Node
     */
     var Edge = Backbone.Model.extend({
-        pathFormat: function() {
-
+        initialize: function () {
+            _.each(["from", "to"], function (node) {
+                _.each(["cx", "cy"], function (prop) {
+                    this.get(node).on('change:' + prop, function () {
+                        this.trigger(node + ':change:' + prop);
+                    }, this);
+                }, this);
+            }, this);
+        },
+        pathFormat: function () {
+            return "M" + this.get("from").get("cx") + "," + this.get("from").get("cy") +
+                "L" + this.get("to").get("cx") + "," + this.get("to").get("cy");
         }
     });
 

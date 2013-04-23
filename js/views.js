@@ -80,17 +80,14 @@
             this.appView.nodes.on("add", function (node) {
                 var nodeView = new NodeView({
                     appView: this.appView,
-                    model: node,
-                    cx: node.get("cx"),
-                    cy: node.get("cy")
+                    model: node
                 });
             }, this);
+
             this.appView.edges.on("add", function (edge) {
                 var nodeView = new EdgeView({
                     appView: this.appView,
-                    model: edge,
-                    cx: node.get("cx"),
-                    cy: node.get("cy")
+                    model: edge
                 });
             }, this);
         },
@@ -119,8 +116,7 @@
             var animationOptions = {
                 opacity: 1
             };
-            
-            this.el.attr(options);
+
             this.el.animate(animationOptions, 100, 'linear');
 
             this.eventBindings();
@@ -128,11 +124,20 @@
         },
 
         draw: function () {
-            return this.appView.paper.circle(100, 100, 20).attr({
+            var nodeR = this.appView.options.nodeR;
+            return this.appView.paper.circle(0, 0, nodeR).attr({
                 fill: "r(0.25, 0.75)yellow-orange",
                 opacity: 0,
-                "stroke-opacity": 0.4
+                "stroke-opacity": 0.4,
+                cx: this.model.get("cx"),
+                cy: this.model.get("cy")
             });
+        },
+
+        removeTempLine: function () {
+            if (this.drag.tempLine && this.drag.tempLine.remove) {
+                this.drag.tempLine.remove();
+            }
         },
 
         drag: {
@@ -143,30 +148,44 @@
                         cy: y
                     });
                 } else {
-                    if (this.tempLine && this.tempLine.remove) {
-                        this.tempLine.remove();
-                    }
+                    this.removeTempLine();
                     var cx = this.model.get("cx");
                     var cy = this.model.get("cy");
-                    this.tempLine = this.appView.paper.path("M" + cx + "," + cy + "L" + x + "," + y)
-                        .toBack();
+                    this.drag.tempLine = this.appView.paper.path("M" + cx + "," + cy + "L" + x + "," + y)
+                        .toBack().attr({
+                        "stroke-dasharray": "-",
+                        "stroke-width": 3
+                    });
                 }
             },
             onEnd: function (event) {
                 if (event.altKey) {
                     return;
                 }
-                if (event.target.tagName === "circle" && event.target !== this.node) {
 
+                if (event.target.tagName === "circle" && event.target !== this.el.node) {
+                    _.extend(event.target, Backbone.Events).trigger("app:createEdge", this);
                 } else {
-                    this.tempLine.remove();
+
                 }
+                this.removeTempLine();
+                setTimeout(_.bind(this.removeTempLine, this), 100);
             }
         },
 
         eventBindings: function () {
             /* UI binding*/
             this.el.drag(_.throttle(this.drag.onMove, 40), function () {}, this.drag.onEnd, this, this, this);
+            _.extend(this.el.node, Backbone.Events).on("app:createEdge", function (from) {
+                this.appView.edges.add({
+                    from: from.model,
+                    to: this.model
+                });
+            }, this);
+
+            this.on('dblclick', function () {
+                this.model.destroy();
+            }, this);
 
             /* Model binding */
             this.model.on("change:cx", function (model, cx) {
@@ -180,6 +199,83 @@
                     cy: cy
                 });
             }, this);
+
+            this.model.on("remove", function () {
+                this.el.remove();
+            }, this);
+        }
+
+    });
+
+    var EdgeView = Backbone.RaphaelElementView.extend({
+        initialize: function (options) {
+            this.appView = options.appView;
+            this.arrow = this.draw();
+
+            this.eventBindings();
+        },
+
+        createArrowFromLine: function (line) {
+            var nodeR = this.appView.options.nodeR;
+            var lineSubpath = line.getSubpath(nodeR, line.getTotalLength() - nodeR);
+            line.remove();
+            this.appView.paper.setStart();
+            line = this.appView.paper.path(lineSubpath);
+            var X = line.getPointAtLength(line.getTotalLength());
+            var Y = line.getPointAtLength(line.getTotalLength() - Math.min.apply(null, [20, line.getTotalLength()]));
+            var norm = {
+                x: -(X.y - Y.y) / 2,
+                y: (X.x - Y.x) / 2
+            };
+            var arrowPoints = [{
+                x: Y.x + norm.x,
+                y: Y.y + norm.y
+            }, {
+                x: Y.x - norm.x,
+                y: Y.y - norm.y
+            }];
+            _.each(arrowPoints, function (point) {
+                this.appView.paper.path("M" + point.x + "," + point.y + "L" + X.x + "," + X.y);
+            }, this);
+            var arrow = this.appView.paper.setFinish();
+            arrow.attr({
+                "stroke-width": 3
+            });
+            return arrow;
+        },
+
+        draw: function () {
+            var line = this.appView.paper.path(this.model.pathFormat());
+            return this.createArrowFromLine(line);
+        },
+
+        erase: function () {
+            this.arrow.forEach(function (el) {
+                el.remove();
+            });
+        },
+
+        redraw: function () {
+            this.erase();
+            this.arrow = this.draw();
+            this.UIBindings();
+        },
+
+        eventBindings: function() {
+            this.UIBindings();
+            this.ModelBindings();
+        },
+
+        UIBindings: function () {
+            this.arrow.dblclick(function (e) {
+                this.model.destroy();
+                this.model.off();
+            }, this);
+        },
+
+        ModelBindings: function() {
+            this.model.on('from:change:cx from:change:cy to:change:cx to:change:cy', _.throttle(this.redraw, 40), this);
+            this.model.on('remove', this.erase, this);
         }
 
     });
