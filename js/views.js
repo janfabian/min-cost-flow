@@ -27,7 +27,6 @@
             };
             _.each(views, viewRaphaelEvents);
         }
-
     });
 
     Backbone.RaphaelElementView = Backbone.View.extend({
@@ -38,7 +37,17 @@
                     this.trigger(e.type, e);
                 }, this));
             }, this);
-        }
+        },
+
+        eventBindings: function () {
+            this.NodeBinding();
+            this.ViewBindings();
+            this.ModelBindings();
+        },
+
+        NodeBinding: function() {},
+        ViewBindings: function () {},
+        ModelBindings: function () {}
 
     });
 
@@ -54,9 +63,23 @@
 
             /* Children Views */
             this.paper = new Raphael(this.el, width, height);
-            var layerView = new LayerView(_.extend({}, options, {
+            this.layerView = new LayerView(_.extend({}, options, {
                 appView: this
             }));
+
+            this.nodes.add([{
+                cx: 100,
+                cy: 100
+            }, {
+                cx: 200,
+                cy: 200
+            }, {
+                cx: 200,
+                cy: 100
+            }, {
+                cx: 100,
+                cy: 200
+            }]);
         }
 
     });
@@ -72,11 +95,11 @@
             this.delegateRaphaelEvents();
         },
 
-        eventBindings: function () {
-            /* UI events*/
+        ViewBindings: function () {
             this.on("click", this.createNode, this);
+        },
 
-            /* Model events*/
+        ModelBindings: function () {
             this.appView.nodes.on("add", function (node) {
                 var nodeView = new NodeView({
                     appView: this.appView,
@@ -102,8 +125,8 @@
         createNode: function (e) {
             e = $.event.fix(e);
             this.appView.nodes.add([{
-                cx: e.offsetX,
-                cy: e.offsetY
+                cx: e.clientX,
+                cy: e.clientY
             }]);
         }
     });
@@ -140,9 +163,16 @@
             }
         },
 
+        isInAnotherCircle: function (element) {
+            return element.tagName === "circle" && element !== this.el.node;
+        },
+
         drag: {
             onMove: function (dx, dy, x, y, event) {
                 if (event.altKey) {
+                    if (this.isInAnotherCircle(event.target)) {
+                        return;
+                    }
                     this.model.set({
                         cx: x,
                         cy: y
@@ -158,49 +188,73 @@
                     });
                 }
             },
+            onStart: function (x, y, event) {
+                this.el.insertAfter(this.appView.layerView.el);
+            },
             onEnd: function (event) {
                 if (event.altKey) {
                     return;
                 }
 
-                if (event.target.tagName === "circle" && event.target !== this.el.node) {
-                    _.extend(event.target, Backbone.Events).trigger("app:createEdge", this);
-                } else {
-
+                if (event.target !== this.el.node) {
+                    _.extend(event.target, Backbone.Events).trigger("app:createEdge", {
+                        from: this.model,
+                        event: event
+                    });
                 }
+
                 this.removeTempLine();
                 setTimeout(_.bind(this.removeTempLine, this), 100);
             }
         },
 
-        eventBindings: function () {
-            /* UI binding*/
-            this.el.drag(_.throttle(this.drag.onMove, 40), function () {}, this.drag.onEnd, this, this, this);
-            _.extend(this.el.node, Backbone.Events).on("app:createEdge", function (from) {
-                this.appView.edges.add({
-                    from: from.model,
+        ViewBindings: function () {
+            this.el.drag(_.throttle(this.drag.onMove, 40), this.drag.onStart, this.drag.onEnd, this, this, this);
+            _.extend(this.el.node, Backbone.Events).on("app:createEdge", function (params) {
+                var from = params.from;
+                if (_.isEqual(from, this.model)) {
+                    return;
+                }
+                if (this.model.existEdgeFrom(from)) {
+                    return;
+                }
+                var edge = new app.Edge({
+                    from: from,
                     to: this.model
                 });
+                this.appView.edges.add(edge);
             }, this);
 
             this.on('dblclick', function () {
                 this.model.destroy();
+                this.stopListening(this.model);
             }, this);
+            this.on("mouseover", _.bind(function () {
+                this.el.attr({
+                    "stroke-width": "4"
+                });
+            }, this));
+            this.on("mouseout", _.bind(function () {
+                this.el.attr({
+                    "stroke-width": "1"
+                });
+            }, this));
+        },
 
-            /* Model binding */
-            this.model.on("change:cx", function (model, cx) {
+        ModelBindings: function () {
+            this.listenTo(this.model, "change:cx", function (model, cx) {
                 this.el.attr({
                     cx: cx
                 });
             }, this);
 
-            this.model.on("change:cy", function (model, cy) {
+            this.listenTo(this.model, "change:cy", function (model, cy) {
                 this.el.attr({
                     cy: cy
                 });
             }, this);
 
-            this.model.on("remove", function () {
+            this.listenTo(this.model, "destroy", function () {
                 this.el.remove();
             }, this);
         }
@@ -210,72 +264,98 @@
     var EdgeView = Backbone.RaphaelElementView.extend({
         initialize: function (options) {
             this.appView = options.appView;
-            this.arrow = this.draw();
+            this.setElement(this.draw());
 
             this.eventBindings();
+            this.delegateRaphaelEvents();
         },
-
-        createArrowFromLine: function (line) {
-            var nodeR = this.appView.options.nodeR;
-            var lineSubpath = line.getSubpath(nodeR, line.getTotalLength() - nodeR);
-            line.remove();
-            this.appView.paper.setStart();
-            line = this.appView.paper.path(lineSubpath);
-            var X = line.getPointAtLength(line.getTotalLength());
-            var Y = line.getPointAtLength(line.getTotalLength() - Math.min.apply(null, [20, line.getTotalLength()]));
-            var norm = {
-                x: -(X.y - Y.y) / 2,
-                y: (X.x - Y.x) / 2
-            };
-            var arrowPoints = [{
-                x: Y.x + norm.x,
-                y: Y.y + norm.y
-            }, {
-                x: Y.x - norm.x,
-                y: Y.y - norm.y
-            }];
-            _.each(arrowPoints, function (point) {
-                this.appView.paper.path("M" + point.x + "," + point.y + "L" + X.x + "," + X.y);
-            }, this);
-            var arrow = this.appView.paper.setFinish();
-            arrow.attr({
-                "stroke-width": 3
-            });
-            return arrow;
+        attrs: {
+            "stroke-width": 3
         },
 
         draw: function () {
-            var line = this.appView.paper.path(this.model.pathFormat());
-            return this.createArrowFromLine(line);
+            var nodeR = this.appView.options.nodeR,
+                line = this.appView.paper.path(this.model.pathFormat()),
+                lineSubpath = line.getSubpath(nodeR, line.getTotalLength() - nodeR);
+            if (line.getTotalLength() < 3 * nodeR) {
+                // sending the short line to the back will prevent adding arrow on
+                // hover
+                return line.toBack().attr(this.attrs);
+            } else {
+                line.remove();
+                return this.appView.paper.path(lineSubpath).attr(_.defaults({}, this.attrs, {
+                    "arrow-end": "classic-wide-long"
+                }));
+            }
         },
 
         erase: function () {
-            this.arrow.forEach(function (el) {
-                el.remove();
-            });
+            this.el.remove && this.el.remove();
         },
 
         redraw: function () {
             this.erase();
-            this.arrow = this.draw();
-            this.UIBindings();
+
+            this.setElement(this.draw());
+            this.NodeBinding();
+            this.delegateRaphaelEvents();
         },
 
-        eventBindings: function() {
-            this.UIBindings();
-            this.ModelBindings();
-        },
+        NodeBinding: function () {
+            _.extend(this.el.node, Backbone.Events).on("app:createEdge", function (params) {
+                var e = $.event.fix(params.event);
+                var from = this.model.get('from'),
+                    to = this.model.get('to');
 
-        UIBindings: function () {
-            this.arrow.dblclick(function (e) {
                 this.model.destroy();
-                this.model.off();
+                this.stopListening(this.model);
+                this.appView.nodes.once('add', function (node) {
+                    this.appView.edges.add({
+                        from: params.from,
+                        to: node
+                    });
+                    this.appView.edges.add({
+                        from: from,
+                        to: node
+                    });
+                    this.appView.edges.add({
+                        from: node,
+                        to: to
+                    });
+                }, this);
+
+                this.appView.layerView.createNode(e);
             }, this);
         },
 
-        ModelBindings: function() {
-            this.model.on('from:change:cx from:change:cy to:change:cx to:change:cy', _.throttle(this.redraw, 40), this);
-            this.model.on('remove', this.erase, this);
+        ViewBindings: function () {
+            this.on("dblclick", function (e) {
+                this.model.destroy();
+                this.stopListening(this.model);
+            }, this);
+
+            this.on("click", function (e) {
+
+            }, this);
+
+            this.on("mouseover", _.bind(function () {
+                this.el.attr({
+                    "stroke-width": "9",
+                    "arrow-end": "classic-narrow-short"
+                });
+            }, this));
+
+            this.on("mouseout", _.bind(function () {
+                this.el.attr(_.defaults({}, this.attrs, {
+                    "stroke-dasharray": "",
+                    "arrow-end": "classic-wide-long"
+                }));
+            }, this));
+        },
+
+        ModelBindings: function () {
+            this.listenTo(this.model, 'from:change:cx from:change:cy to:change:cx to:change:cy', _.throttle(this.redraw, 40), this);
+            this.listenTo(this.model, 'destroy', this.erase, this);
         }
 
     });
