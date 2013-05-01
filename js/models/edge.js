@@ -18,9 +18,13 @@ define(['backbone', 'underscore'], function (Backbone, _) {
             from.get("adjacent").push(this);
             to.get("previous").push(this);
         },
-        pathFormat: function () {
-            return "M" + this.get("from").get("cx") + "," + this.get("from").get("cy") +
-                "L" + this.get("to").get("cx") + "," + this.get("to").get("cy");
+
+        defaults: function() {
+            return {
+                U: 0,
+                L: 0, 
+                C: 0 
+            }
         }
     });
     return Edge;

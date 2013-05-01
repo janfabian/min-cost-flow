@@ -14,12 +14,12 @@ define(['backbone', 'underscore'], function (Backbone, _) {
         },
 
         eventBindings: function () {
-            this.NodeBinding();
+            this.DOMBindings();
             this.ViewBindings();
             this.ModelBindings();
         },
 
-        NodeBinding: function () {},
+        DOMBindings: function () {},
         ViewBindings: function () {},
         ModelBindings: function () {}
 

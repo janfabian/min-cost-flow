@@ -7,7 +7,11 @@
     "backbone-amd": null,
     "underscore-amd": null,
     "raphael": null,
-    "eve": null,
- 	"modernizr": null
+    "modernizr": null,
+    "eve": "git@github.com:adobe-webplatform/eve.git",
+    "async": null
+  },
+  "devDependencies": {
+    "requirejs-text": "~2.0.6"
   }
 }

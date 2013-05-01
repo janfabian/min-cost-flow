@@ -4,9 +4,12 @@ require.config({
         'underscore': 'vendor/underscore-amd/underscore',
         'backbone': 'vendor/backbone-amd/backbone',
         'raphael': 'vendor/raphael/raphael',
-        'eve': 'vendor/eve/eve'
+        'eve': 'vendor/eve/eve',
+        'async': 'vendor/async/lib',
+        'text': 'vendor/requirejs-text/text'
     },
     shim: {
+        
         'raphael': {
             deps: ['eve'],
             exports: "Raphael"
@@ -19,7 +22,7 @@ require(['views/app', 'jquery'], function (AppView, $) {
         var config = {
             el: $("#canvas-container"),
             width: 1000,
-            height: 1000,
+            height: 500,
             nodeR: 20
         };
 

@@ -2,10 +2,15 @@ define(['backbone', 'underscore', 'collections/edges'], function (Backbone, _,  
 
     var Node = Backbone.Model.extend({
         initialize: function () {
-            this.set('adjacent', new Edges());
-            this.set('previous', new Edges());
-
             this.eventBindings();
+        },
+
+        defaults: function() {
+            return {
+                b: 0,
+                adjacent: new Edges(),
+                previous: new Edges()
+            }
         },
 
         existEdgeFrom: function (from) {

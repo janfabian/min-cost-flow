@@ -1,0 +1,6 @@
+<section class="editEdge">
+	<h3><%= type %></h3>
+	<% _.each(inputs, function(input) {%>
+		<label><%= input.name %></label><input type="number" min="0" step="1" value="<%= model.get(input.attr) %>" data-holder="<%= input.attr %>">
+	<%});%>
+</section>

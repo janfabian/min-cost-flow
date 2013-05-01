@@ -231,3 +231,51 @@ table {
   border-collapse: collapse;
   border-spacing: 0;
 }
+
+/* line 8, ../sass/screen.scss */
+#canvas-container {
+  width: 1000px;
+  margin-top: 10px;
+  height: 500px;
+  margin-left: auto;
+  margin-right: auto;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0 0 8px 0;
+  -moz-box-shadow: rgba(0, 0, 0, 0.5) 0 0 8px 0;
+  box-shadow: rgba(0, 0, 0, 0.5) 0 0 8px 0;
+}
+
+/* line 18, ../sass/screen.scss */
+.editEdge {
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  background: rgba(0, 0, 0, 0.6);
+  padding: 5px;
+  width: 100px;
+  font-size: .8em;
+}
+/* line 24, ../sass/screen.scss */
+.editEdge h3 {
+  margin: 0 0 3px 0;
+  padding: 3px;
+  color: white;
+  border-bottom: 2px solid rgba(255, 255, 255, 0.4);
+  text-shadow: black 0px 0px 5px;
+}
+/* line 31, ../sass/screen.scss */
+.editEdge label {
+  color: white;
+  float: left;
+  height: 15px;
+  padding: 3px;
+  width: 35%;
+  text-shadow: black 0px 0px 5px;
+}
+/* line 39, ../sass/screen.scss */
+.editEdge input {
+  width: 50%;
+  float: right;
+}

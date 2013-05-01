@@ -1,4 +1,4 @@
-define(['jquery', 'views/raphaelElement'], function ($, RaphaelElement) {
+define(['jquery', 'underscore', 'views/raphaelElement', 'views/layers/mask', 'views/edit/node', 'utils/view'], function ($, _, RaphaelElement, MaskView, EditNodeView, viewUtils) {
     var NodeView = RaphaelElement.extend({
         initialize: function (options) {
             this.appView = options.appView;
@@ -7,6 +7,10 @@ define(['jquery', 'views/raphaelElement'], function ($, RaphaelElement) {
             var animationOptions = {
                 opacity: 1
             };
+
+            this.nodeEditView = new EditNodeView(_.extend({}, this.options, {
+                model: this.model
+            }));
 
             this.el.animate(animationOptions, 100, 'linear');
 
@@ -37,30 +41,37 @@ define(['jquery', 'views/raphaelElement'], function ($, RaphaelElement) {
 
         drag: {
             onMove: function (dx, dy, x, y, event) {
-                if (event.altKey) {
+                event = viewUtils.normalize(event);
+                if (event.altKey && this.drag.startWithAlt) {
                     if (this.isInAnotherCircle(event.target)) {
                         return;
                     }
                     this.model.set({
-                        cx: x,
-                        cy: y
+                        cx: event.position.x,
+                        cy: event.position.y
                     });
                 } else {
                     this.removeTempLine();
                     var cx = this.model.get("cx");
                     var cy = this.model.get("cy");
-                    this.drag.tempLine = this.appView.paper.path("M" + cx + "," + cy + "L" + x + "," + y)
+                    this.drag.tempLine = this.appView.paper.path("M" + cx + "," + cy + "L" + event.position.x + "," + event.position.y)
                         .toBack().attr({
                         "stroke-dasharray": "-",
                         "stroke-width": 3
                     });
                 }
+                this.drag.removeEditWindowOnce();
             },
             onStart: function (x, y, event) {
-                this.el.insertAfter(this.appView.layerView.el);
+                this.drag.startWithAlt = false;
+                if (event.altKey) {
+                    this.drag.startWithAlt = true;
+                    this.el.insertAfter(this.appView.layerView.el);
+                }
+                this.drag.removeEditWindowOnce = _.once(_.bind(this.nodeEditView.remove, this.nodeEditView));
             },
             onEnd: function (event) {
-                if (event.altKey) {
+                if (event.altKey && this.drag.startWithAlt) {
                     return;
                 }
 
@@ -76,8 +87,9 @@ define(['jquery', 'views/raphaelElement'], function ($, RaphaelElement) {
             }
         },
 
-        ViewBindings: function () {
+        DOMBindings: function () {
             this.el.drag(_.throttle(this.drag.onMove, 40), this.drag.onStart, this.drag.onEnd, this, this, this);
+
             _.extend(this.el.node, Backbone.Events).on("app:createEdge", function (params) {
                 var from = params.from;
                 if (_.isEqual(from, this.model)) {
@@ -88,41 +100,59 @@ define(['jquery', 'views/raphaelElement'], function ($, RaphaelElement) {
                 }
                 this.appView.edges.add({
                     from: from,
-                    to: this.model                    
+                    to: this.model
                 });
             }, this);
+        },
 
+        ViewBindings: function () {
             this.on('dblclick', function () {
                 this.model.destroy();
                 this.stopListening(this.model);
             }, this);
-            this.on("mouseover", _.bind(function () {
+
+            this.on('mousedown', function (e) {
+                this.appView.clearSelected();
+                if (!e.altKey) {
+                    this.appView.selected.add(this);
+                }
+            }, this);
+
+            this.on("mouseover", function () {
                 this.el.attr({
                     "stroke-width": "4"
                 });
-            }, this));
-            this.on("mouseout", _.bind(function () {
+            }, this);
+
+            this.on("mouseout", function () {
                 this.el.attr({
                     "stroke-width": "1"
                 });
-            }, this));
-        },
+            }, this);
 
-        ModelBindings: function () {
-            this.listenTo(this.model, "change:cx", function (model, cx) {
-                this.el.attr({
-                    cx: cx
+            this.on("app:select", function () {
+                this.nodeEditView.render({
+                    x: this.model.get('cx') + 20,
+                    y: this.model.get('cy')
                 });
             }, this);
 
-            this.listenTo(this.model, "change:cy", function (model, cy) {
+            this.on("app:deselect", function () {
+                this.nodeEditView.remove();
+            }, this);
+        },
+
+        ModelBindings: function () {
+            this.listenTo(this.model, "change:cx change:cy", function (model, cx) {
                 this.el.attr({
-                    cy: cy
+                    cx: this.model.get('cx'),
+                    cy: this.model.get('cy')
                 });
             }, this);
 
             this.listenTo(this.model, "destroy", function () {
                 this.el.remove();
+                this.nodeEditView.remove();
             }, this);
         }
 

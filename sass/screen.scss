@@ -1,2 +1,43 @@
 @import "normalize";
+@import "compass/css3/border-radius";
+@import "compass/css3/box-shadow";
+@import "compass/css3/text-shadow";
+
 @include normalize;
+
+#canvas-container {
+	width: 1000px;
+	margin-top: 10px;
+	height: 500px;
+	margin-left: auto;
+	margin-right: auto;
+	border: 1px solid rgba(black, .5);
+	@include box-shadow(rgba(black, .5) 0 0 8px 0)
+}
+
+.editEdge {
+	@include border-radius(5px);
+	background: rgba(black, .6);
+	padding: 5px;
+	width: 100px;
+	font-size: .8em;
+	h3 {
+		margin: 0 0 3px 0;
+		padding: 3px;
+		color: white;
+		border-bottom: 2px solid rgba(white, .4);
+		@include text-shadow(black 0px 0px 5px)
+	}
+	label {
+		color: white;
+		float: left;
+		height: 15px;
+		padding: 3px;
+		width: 35%;
+		@include text-shadow(black 0px 0px 5px);
+	}
+	input {
+		width: 50%;
+		float: right;
+	}
+}
