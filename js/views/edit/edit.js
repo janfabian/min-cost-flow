@@ -35,7 +35,7 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
             var $target = $(event.target),
                 val;
             // assign to val, not typo 
-            if (val = parseFloat($target.val())) {
+            if (_.isNumber(val = parseFloat($target.val()))) {
                 this.model.set($target.attr('data-holder'), val);
             }
         }

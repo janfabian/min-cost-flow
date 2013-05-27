@@ -1,6 +1,11 @@
 define(['jquery', 'views/raphaelElement', 'views/node', 'views/edge', 'views/layers/layer', 'utils/view'], function ($, RaphaelElement, NodeView, EdgeView, LayerView, viewUtils) {
     var BackgroundView = LayerView.extend({
 
+        DOMBindings: function () {
+            _.extend(this.el.node, Backbone.Events).on("app:createEdge", function (params) {
+            }, this);
+        },
+
         ViewBindings: function () {
             this.on("click", this.createNode, this);
         },
@@ -24,9 +29,8 @@ define(['jquery', 'views/raphaelElement', 'views/node', 'views/edge', 'views/lay
         createNode: function (e) {
             e = viewUtils.normalize(e);
             this.appView.nodes.add([{
-                // firefox polyfill
-                cx: e.offsetX,
-                cy: e.offsetY
+                cx: e.position.x,
+                cy: e.position.y
             }]);
         }
     });

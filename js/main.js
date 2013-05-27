@@ -26,6 +26,6 @@ require(['views/app', 'jquery'], function (AppView, $) {
             nodeR: 20
         };
 
-        new AppView(config);
+        window.app = new AppView(config);
     });
 });

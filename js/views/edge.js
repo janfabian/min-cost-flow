@@ -12,6 +12,7 @@ define(['jquery', 'underscore', 'raphael', 'views/raphaelElement', 'views/edit/e
 
             this.eventBindings();
             this.delegateRaphaelEvents();
+            this.delegateRaphaelEvents(this.label);
         },
 
         attrs: {
@@ -60,7 +61,7 @@ define(['jquery', 'underscore', 'raphael', 'views/raphaelElement', 'views/edit/e
                 angleDif = -Math.atan2(lineDir.x, lineDir.y) + Math.atan2(dir.x, dir.y),
                 centerS = {
                     x: this.model.get('to').get('cx') - 20 * viewUtils.normalizeVector(lineDir).x,
-                    y: this.model.get('to').get('cy') - 20 * viewUtils.normalizeVector(lineDir).y,
+                    y: this.model.get('to').get('cy') - 20 * viewUtils.normalizeVector(lineDir).y
                 },
                 trans =
                     "r" + (angleDif * 180 / Math.PI) + "," + this.model.get('to').get('cx') + "," + this.model.get('to').get('cy') +
@@ -100,8 +101,8 @@ define(['jquery', 'underscore', 'raphael', 'views/raphaelElement', 'views/edit/e
 
         draw: function () {
             var nodeR = this.appView.options.nodeR,
-                line = this.appView.paper.path(this.pathFormat());
-            lineSubpath = line.getSubpath(nodeR, line.getTotalLength() - nodeR);
+                line = this.appView.paper.path(this.pathFormat()),
+                lineSubpath = line.getSubpath(nodeR, line.getTotalLength() - nodeR);
             if (line.getTotalLength() < 3 * nodeR) {
                 // sending the short line to the back will prevent adding arrow on
                 // hover
@@ -211,11 +212,13 @@ define(['jquery', 'underscore', 'raphael', 'views/raphaelElement', 'views/edit/e
         ModelBindings: function () {
             this.listenTo(this.model, 'from:change:cx from:change:cy to:change:cx to:change:cy', _.throttle(this.redraw, 40), this);
             this.listenTo(this.model, 'destroy', function () {
+                this.stopListening(this.model);
                 this.erase(true);
             }, this);
             this.listenTo(this.model, 'change', function () {
-                this.label.remove();
-                this.label = this.drawInfo();
+                this.label.attr({
+                    text: this.infoFormat()
+                });
             }, this);
         }
 

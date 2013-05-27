@@ -1,4 +1,11 @@
-define(['backbone', 'raphael', 'collections/nodes', 'collections/edges', 'views/layers/layer', 'views/layers/background'], function (Backbone, Raphael, Nodes, Edges, Layer, BackgroundView) {
+define([
+    'backbone',
+    'raphael',
+    'collections/nodes',
+    'collections/edges',
+    'views/layers/layer',
+    'views/layers/background',
+    'algorithms/ssp'], function (Backbone, Raphael, Nodes, Edges, Layer, BackgroundView, SSP) {
     var App = Backbone.View.extend({
 
         initialize: function (options) {
@@ -23,7 +30,7 @@ define(['backbone', 'raphael', 'collections/nodes', 'collections/edges', 'views/
             this.nodes.add([{
                 cx: 100,
                 cy: 200,
-                b: -4
+                b: 4
             }, {
                 cx: 300,
                 cy: 100
@@ -33,13 +40,14 @@ define(['backbone', 'raphael', 'collections/nodes', 'collections/edges', 'views/
             }, {
                 cx: 500,
                 cy: 200,
-                b: 4
+                b: -4
             }]);
             this.edges.add([{
                 from: this.nodes.at(0),
                 to: this.nodes.at(1),
                 C: 2,
-                U: 4
+                U: 0,
+                L: 0
             }, {
                 from: this.nodes.at(0),
                 to: this.nodes.at(2),
@@ -61,6 +69,22 @@ define(['backbone', 'raphael', 'collections/nodes', 'collections/edges', 'views/
                 C: 1,
                 U: 5
             }]);
+
+            var ssp = window.ssp = new SSP({
+                nodes: this.nodes,
+                edges: this.edges,
+                start: this.nodes.at(0)
+            });
+
+            window.mincost = function() {
+                ssp.start();
+                _.each(app.nodes.filter(function(node){
+                    return node.get('b') > 0;
+                }), function(node) {
+                    node.trigger('app:sendStuff');
+                });
+                app.edges.print();
+            };
         },
 
         selected: new Backbone.Collection(),

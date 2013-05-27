@@ -5,9 +5,10 @@ define(['backbone', 'underscore'], function (Backbone, _) {
         
     var RaphaelElement = Backbone.View.extend({
 
-        delegateRaphaelEvents: function () {
+        delegateRaphaelEvents: function (el) {
+            el = el || this.el;
             _.each(raphaelEvents, function (eventName) {
-                this.el[eventName](_.bind(function (e) {
+                el[eventName](_.bind(function (e) {
                     this.trigger(e.type, e);
                 }, this));
             }, this);

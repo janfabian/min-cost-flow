@@ -13,19 +13,29 @@ define(['backbone', 'underscore'], function (Backbone, _) {
                     }, this);
                 }, this);
             }, this);
-            var from = this.get("from");
-            var to = this.get("to");
-            from.get("adjacent").push(this);
-            to.get("previous").push(this);
+            this.get("from").get("adjacent").push(this);
+            this.get("to").get("previous").push(this);
+
+            this.eventBindings();
         },
 
-        defaults: function() {
+        defaults: function () {
             return {
-                U: 0,
-                L: 0, 
-                C: 0 
-            }
+                U: Infinity,
+                L: 0,
+                C: 0,
+                _Cpi: 0,
+                x: 0
+            };
+        },
+
+        eventBindings: function () {
+            this.on('destroy', function (node) {
+                this.get("from").get("adjacent").remove(this);
+                this.get("to").get("previous").remove(this);
+            }, this);
         }
+
     });
     return Edge;
 });

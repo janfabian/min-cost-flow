@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'views/raphaelElement', 'views/layers/mask', 'views/edit/node', 'utils/view'], function ($, _, RaphaelElement, MaskView, EditNodeView, viewUtils) {
+define(['jquery', 'underscore', 'raphael', 'views/raphaelElement', 'views/layers/mask', 'views/edit/node', 'utils/view'], function ($, _, Raphael, RaphaelElement, MaskView, EditNodeView, viewUtils) {
     var NodeView = RaphaelElement.extend({
         initialize: function (options) {
             this.appView = options.appView;
@@ -153,6 +153,36 @@ define(['jquery', 'underscore', 'views/raphaelElement', 'views/layers/mask', 'vi
             this.listenTo(this.model, "destroy", function () {
                 this.el.remove();
                 this.nodeEditView.remove();
+            }, this);
+
+
+            this.listenTo(this.model, "app:sendStuff", function () {
+                this.model.get('adjacent').each(function (edge) {
+                    if (edge.get('x') <= 0) {
+                        return;
+                    }
+                    var circle = this.draw().attr({
+                        fill: "blue"
+                    });
+                    var text = this.appView.paper.text(this.model.get("cx"), this.model.get("cy"), edge.get('x')).attr({
+                        "font-size": 15,
+                        "font-weight": "bold",
+                        fill: "white"
+                    });
+                    var grp = this.appView.paper.set();
+                    grp.push(circle, text);
+                    grp.animate({
+                        x: edge.get('to').get('cx'),
+                        y: edge.get('to').get('cy'),
+                        cx: edge.get('to').get('cx'),
+                        cy: edge.get('to').get('cy')
+                    }, 4e3, '<>', _.bind(function () {
+                        edge.get('to').receive(edge.get('x'));
+                    }, this));
+                    edge.get('to').once('app:sendStuff', function () {
+                        grp.remove();
+                    });
+                }, this);
             }, this);
         }
 

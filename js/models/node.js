@@ -1,16 +1,22 @@
-define(['backbone', 'underscore', 'collections/edges'], function (Backbone, _,  Edges) {
+define(['backbone', 'underscore', 'collections/edges'], function (Backbone, _, Edges) {
 
     var Node = Backbone.Model.extend({
         initialize: function () {
             this.eventBindings();
         },
 
-        defaults: function() {
+        defaults: function () {
             return {
                 b: 0,
+                _pi: 0,
                 adjacent: new Edges(),
-                previous: new Edges()
-            }
+                previous: new Edges(),
+                xReceived: 0
+            };
+        },
+
+        receive: function (x) {
+            this.set('xReceived', this.get('xReceived') + x);
         },
 
         existEdgeFrom: function (from) {
@@ -27,17 +33,29 @@ define(['backbone', 'underscore', 'collections/edges'], function (Backbone, _,  
 
         eventBindings: function () {
             this.on('destroy', function (node) {
-                function destroy(edge) {
-                    _.defer(function () {
-                        edge.destroy();
-                        edge.off();
+                var model;
+
+                while (model = this.get('adjacent').first()) {
+                    model.destroy();
+                }
+
+                while (model = this.get('previous').first()) {
+                    model.destroy();
+                }
+            }, this);
+
+            this.on('change:xReceived', function () {
+                if ((this.get('b') === 0 && this.get('xReceived') >= this.get('adjacent').reduce(function (memo, edge) {
+                    return memo + edge.get('x');
+                }, 0)) || (this.get('b') !== 0 && this.get('xReceived') >= Math.abs(this.get('b')))) {
+                    this.trigger('app:sendStuff');
+                    this.set('xReceived', 0, {
+                        silent: true
                     });
                 }
-                this.get('adjacent').each(destroy, this);
-                this.get('previous').each(destroy, this);
             }, this);
         }
     });
-    
+
     return Node;
 });
