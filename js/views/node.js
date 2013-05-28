@@ -1,8 +1,22 @@
-define(['jquery', 'underscore', 'raphael', 'views/raphaelElement', 'views/layers/mask', 'views/edit/node', 'utils/view'], function ($, _, Raphael, RaphaelElement, MaskView, EditNodeView, viewUtils) {
+define([
+    'backbone',
+    'jquery',
+    'underscore',
+    'raphael',
+    'views/raphaelElement',
+    'views/layers/mask',
+    'views/edit/node',
+    'utils/view'], function (Backbone, $, _, Raphael, RaphaelElement, MaskView, EditNodeView, viewUtils) {
     var NodeView = RaphaelElement.extend({
         initialize: function (options) {
             this.appView = options.appView;
             this.setElement(this.draw());
+            var nodeR = this.appView.options.nodeR;
+            this.text = this.appView.paper.text(this.model.get("cx"), this.model.get("cy") - nodeR - 10, this.model.get("b")).attr({
+                "font-size": 15,
+                "font-weight": "bold",
+                fill: "black"
+            });
 
             var animationOptions = {
                 opacity: 1
@@ -18,10 +32,21 @@ define(['jquery', 'underscore', 'raphael', 'views/raphaelElement', 'views/layers
             this.delegateRaphaelEvents();
         },
 
+        chooseColor: function () {
+            var b = this.model.get('b');
+            if (b > 0) {
+                return "white-green";
+            } else if (b < 0) {
+                return "white-red";
+            } else {
+                return "yellow-orange";
+            }
+        },
+
         draw: function () {
             var nodeR = this.appView.options.nodeR;
             return this.appView.paper.circle(0, 0, nodeR).attr({
-                fill: "r(0.25, 0.75)yellow-orange",
+                fill: "r(0.25, 0.75)" + this.chooseColor(),
                 opacity: 0,
                 "stroke-opacity": 0.4,
                 cx: this.model.get("cx"),
@@ -133,7 +158,7 @@ define(['jquery', 'underscore', 'raphael', 'views/raphaelElement', 'views/layers
             this.on("app:select", function () {
                 this.nodeEditView.render({
                     x: this.model.get('cx') + 20,
-                    y: this.model.get('cy')
+                    y: this.model.get('cy') + 20
                 });
             }, this);
 
@@ -148,11 +173,26 @@ define(['jquery', 'underscore', 'raphael', 'views/raphaelElement', 'views/layers
                     cx: this.model.get('cx'),
                     cy: this.model.get('cy')
                 });
+                var nodeR = this.appView.options.nodeR;
+                this.text.attr({
+                    x: this.model.get('cx'),
+                    y: this.model.get('cy') - nodeR - 10
+                });
+            }, this);
+
+            this.listenTo(this.model, "change:b", function (model, b) {
+                this.el.attr({
+                    fill: "r(0.25, 0.75)" + this.chooseColor()
+                });
+                this.text.attr({
+                    text: b
+                });
             }, this);
 
             this.listenTo(this.model, "destroy", function () {
                 this.el.remove();
                 this.nodeEditView.remove();
+                this.text.remove();
             }, this);
 
 

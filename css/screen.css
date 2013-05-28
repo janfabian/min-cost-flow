@@ -232,20 +232,219 @@ table {
   border-spacing: 0;
 }
 
-/* line 8, ../sass/screen.scss */
-#canvas-container {
+/* line 19, ../sass/screen.scss */
+body {
+  padding-bottom: 100px;
+}
+
+/* line 23, ../sass/screen.scss */
+header {
   width: 1000px;
-  margin-top: 10px;
-  height: 500px;
   margin-left: auto;
   margin-right: auto;
+}
+/* line 25, ../sass/screen.scss */
+header aside {
+  margin-right: 20px;
+  padding: 8px 20px;
+  background: rgba(0, 0, 0, 0.2);
+  -webkit-border-radius: 5px;
+  -moz-border-radius: 5px;
+  -ms-border-radius: 5px;
+  -o-border-radius: 5px;
+  border-radius: 5px;
+  font-size: 2em;
+  float: right;
+  cursor: pointer;
+}
+/* line 33, ../sass/screen.scss */
+header aside a {
+  color: black;
+  text-decoration: none;
+}
+/* line 38, ../sass/screen.scss */
+header aside.help:hover a:after {
+  content: "help";
+}
+/* line 43, ../sass/screen.scss */
+header nav.examples {
+  float: right;
+}
+/* line 45, ../sass/screen.scss */
+header nav.examples h3 {
+  margin: 0 0 8px 0;
+  padding: 0;
+}
+/* line 49, ../sass/screen.scss */
+header nav.examples > ul {
+  margin: right;
+  list-style-type: none;
+}
+/* line 5, ../../../../../.rvm/gems/ruby-1.9.3-p194/gems/compass-0.12.2/frameworks/compass/stylesheets/compass/typography/lists/_inline-list.scss */
+header nav.examples > ul, header nav.examples > ul li {
+  margin: 0px;
+  padding: 0px;
+  display: inline;
+}
+/* line 53, ../sass/screen.scss */
+header nav.examples li {
+  padding: 5px 8px !important;
+  background-color: rgba(255, 165, 0, 0.2);
+}
+/* line 56, ../sass/screen.scss */
+header nav.examples li:first-child {
+  -webkit-border-radius: 5px 0 0 5px;
+  -moz-border-radius: 5px 0 0 5px;
+  -ms-border-radius: 5px 0 0 5px;
+  -o-border-radius: 5px 0 0 5px;
+  border-radius: 5px 0 0 5px;
+}
+/* line 59, ../sass/screen.scss */
+header nav.examples li:last-child {
+  -webkit-border-radius: 0 5px 5px 0;
+  -moz-border-radius: 0 5px 5px 0;
+  -ms-border-radius: 0 5px 5px 0;
+  -o-border-radius: 0 5px 5px 0;
+  border-radius: 0 5px 5px 0;
+}
+/* line 62, ../sass/screen.scss */
+header nav.examples li a {
+  color: rgba(0, 0, 0, 0.8);
+}
+/* line 65, ../sass/screen.scss */
+header nav.examples li:hover {
+  -webkit-transition: background-color 200ms linear;
+  -moz-transition: background-color 200ms linear;
+  -o-transition: background-color 200ms linear;
+  transition: background-color 200ms linear;
+  background-color: orange;
+}
+/* line 68, ../sass/screen.scss */
+header nav.examples li:hover a {
+  -webkit-transition: color 200ms linear;
+  -moz-transition: color 200ms linear;
+  -o-transition: color 200ms linear;
+  transition: color 200ms linear;
+  color: white;
+}
+
+/* line 77, ../sass/screen.scss */
+nav.toolbar {
+  position: absolute;
+  margin-left: -80px;
+}
+/* line 80, ../sass/screen.scss */
+nav.toolbar ul {
+  list-style-type: none;
+  padding: 0;
+  margin: 0;
+}
+/* line 84, ../sass/screen.scss */
+nav.toolbar ul a {
+  text-decoration: none;
+  display: block;
+  padding: 10px;
+  width: 50px;
+  text-align: center;
+  color: rgba(0, 0, 0, 0.8);
+}
+/* line 91, ../sass/screen.scss */
+nav.toolbar ul a[action='save']:before {
+  content: "\21D3";
+  margin-right: 2px;
+}
+/* line 95, ../sass/screen.scss */
+nav.toolbar ul a[action='load']:before {
+  content: "\21D1";
+  margin-right: 2px;
+}
+/* line 100, ../sass/screen.scss */
+nav.toolbar ul li {
+  background: rgba(255, 165, 0, 0.2);
+  margin-bottom: 3px;
+}
+/* line 103, ../sass/screen.scss */
+nav.toolbar ul li:hover {
+  -webkit-transition: background-color 200ms linear;
+  -moz-transition: background-color 200ms linear;
+  -o-transition: background-color 200ms linear;
+  transition: background-color 200ms linear;
+  background-color: orange;
+}
+/* line 106, ../sass/screen.scss */
+nav.toolbar ul li:hover a {
+  -webkit-transition: color 200ms linear;
+  -moz-transition: color 200ms linear;
+  -o-transition: color 200ms linear;
+  transition: color 200ms linear;
+  color: white;
+}
+
+/* line 115, ../sass/screen.scss */
+#canvas-container {
+  width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+  margin-top: 10px;
+  height: 500px;
   border: 1px solid rgba(0, 0, 0, 0.5);
   -webkit-box-shadow: rgba(0, 0, 0, 0.5) 0 0 8px 0;
   -moz-box-shadow: rgba(0, 0, 0, 0.5) 0 0 8px 0;
   box-shadow: rgba(0, 0, 0, 0.5) 0 0 8px 0;
 }
 
-/* line 18, ../sass/screen.scss */
+/* line 123, ../sass/screen.scss */
+section#text {
+  margin-top: 30px;
+  margin-bottom: 30px;
+  overflow: auto;
+  width: 1000px;
+  margin-left: auto;
+  margin-right: auto;
+}
+/* line 128, ../sass/screen.scss */
+section#text nav.side {
+  float: left;
+  width: 300px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+}
+/* line 132, ../sass/screen.scss */
+section#text nav.side h4 {
+  margin: 10px 0px;
+}
+/* line 135, ../sass/screen.scss */
+section#text nav.side ul {
+  list-style-type: none;
+}
+/* line 137, ../sass/screen.scss */
+section#text nav.side ul a {
+  padding: 5px 10px;
+  color: black;
+  text-decoration: none;
+}
+/* line 144, ../sass/screen.scss */
+section#text nav.side ul a:hover {
+  font-weight: bold;
+}
+/* line 149, ../sass/screen.scss */
+section#text nav.side ul li:before {
+  content: "\00BB \0020";
+}
+/* line 154, ../sass/screen.scss */
+section#text article {
+  width: 700px;
+  padding: 10px;
+  float: right;
+  border-left: 1px solid rgba(0, 0, 0, 0.7);
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  line-height: 1.5em;
+}
+
+/* line 164, ../sass/screen.scss */
 .editEdge {
   -webkit-border-radius: 5px;
   -moz-border-radius: 5px;
@@ -257,7 +456,7 @@ table {
   width: 100px;
   font-size: .8em;
 }
-/* line 24, ../sass/screen.scss */
+/* line 170, ../sass/screen.scss */
 .editEdge h3 {
   margin: 0 0 3px 0;
   padding: 3px;
@@ -265,7 +464,7 @@ table {
   border-bottom: 2px solid rgba(255, 255, 255, 0.4);
   text-shadow: black 0px 0px 5px;
 }
-/* line 31, ../sass/screen.scss */
+/* line 177, ../sass/screen.scss */
 .editEdge label {
   color: white;
   float: left;
@@ -274,8 +473,50 @@ table {
   width: 35%;
   text-shadow: black 0px 0px 5px;
 }
-/* line 39, ../sass/screen.scss */
+/* line 185, ../sass/screen.scss */
 .editEdge input {
   width: 50%;
   float: right;
+}
+
+/* line 191, ../sass/screen.scss */
+.background-black {
+  content: "";
+  height: 100%;
+  width: 100%;
+  left: 0;
+  top: 0;
+  position: fixed;
+  z-index: 999;
+  background: rgba(0, 0, 0, 0.8);
+  cursor: pointer;
+}
+
+/* line 203, ../sass/screen.scss */
+.modal-window {
+  background: white;
+  position: fixed;
+  width: 700px;
+  z-index: 1000;
+  padding: 30px;
+  -webkit-box-sizing: border-box;
+  -moz-box-sizing: border-box;
+  box-sizing: border-box;
+  -webkit-box-shadow: black 0 0 10px 0;
+  -moz-box-shadow: black 0 0 10px 0;
+  box-shadow: black 0 0 10px 0;
+}
+/* line 211, ../sass/screen.scss */
+.modal-window .close {
+  float: right;
+  background: rgba(0, 0, 0, 0.2);
+  padding: 3px 5px;
+  cursor: pointer;
+}
+
+/* line 219, ../sass/screen.scss */
+span.code {
+  background: rgba(0, 0, 0, 0.2);
+  padding: 3px 5px;
+  font-family: 'Lucida Console', 'Bitstream Vera Sans Mono', 'Courier New', Monaco, Courier, monospace;
 }

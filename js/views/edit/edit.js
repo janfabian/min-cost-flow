@@ -1,6 +1,4 @@
-/* jshint forin:true, noarg:true, noempty:true, eqeqeq:true, bitwise:true, strict:true, undef:true, unused:true, curly:true, browser:true, indent:4, maxerr:50 */
-/* global define*/
-define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
+define(['jquery', 'underscore', 'backbone', 'utils/view'], function ($, _, Backbone, utilsView) {
     var EditView = Backbone.View.extend({
         remove: function () {
             // clear global event listener
@@ -11,6 +9,7 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
 
         removeOnEsc: function (event) {
             if (event.keyCode === 27) {
+                $(event.target).blur();
                 this.remove();
             }
         },
@@ -20,8 +19,8 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
 
             this.$el.appendTo(this.options.appView.$el).css({
                 position: "absolute",
-                marginLeft: options.x,
-                marginTop: options.y,
+                marginLeft: options.x+1,
+                marginTop: options.y+1,
                 display: "none",
                 top: 0
             }).stop().fadeIn(200);
@@ -33,10 +32,13 @@ define(['jquery', 'underscore', 'backbone'], function ($, _, Backbone) {
 
         onChange: function (event) {
             var $target = $(event.target),
-                val;
+                val = parseFloat($target.val());
             // assign to val, not typo 
-            if (_.isNumber(val = parseFloat($target.val()))) {
+            if (_.isNumber(val) && !_.isNaN(val)) {
                 this.model.set($target.attr('data-holder'), val);
+            }
+            else if ($target.val() === "" && $target.attr('data-holder') === "U") {
+                this.model.set("U", Infinity);
             }
         }
     });

@@ -25,6 +25,14 @@ define(['backbone', 'underscore', 'collections/edges'], function (Backbone, _, E
             }) ? true : false;
         },
 
+        savingData: function() {
+            return {
+                b: this.get('b'),
+                cx: this.get('cx'),
+                cy: this.get('cy')
+            };
+        },
+
         existEdgeTo: function (to) {
             return this.get('adjacent').findWhere({
                 to: to

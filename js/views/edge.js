@@ -1,4 +1,4 @@
-define(['jquery', 'underscore', 'raphael', 'views/raphaelElement', 'views/edit/edge', 'utils/view'], function ($, _, Raphael, RaphaelElement, EditEdgeView, viewUtils) {
+define(['backbone', 'jquery', 'underscore', 'raphael', 'views/raphaelElement', 'views/edit/edge', 'utils/view'], function (Backbone, $, _, Raphael, RaphaelElement, EditEdgeView, viewUtils) {
     var EdgeView = RaphaelElement.extend({
         initialize: function (options) {
             this.appView = options.appView;

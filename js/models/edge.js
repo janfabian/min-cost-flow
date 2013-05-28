@@ -29,6 +29,16 @@ define(['backbone', 'underscore'], function (Backbone, _) {
             };
         },
 
+        savingData: function () {
+            return {
+                from: this.get('from').collection.indexOf(this.get('from')),
+                to: this.get('to').collection.indexOf(this.get('to')),
+                C: this.get('C'),
+                L: this.get('L'),
+                U: this.get('U')
+            };
+        },
+
         eventBindings: function () {
             this.on('destroy', function (node) {
                 this.get("from").get("adjacent").remove(this);

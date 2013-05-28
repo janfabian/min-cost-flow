@@ -3,6 +3,7 @@ require.config({
         'jquery': 'vendor/jquery/jquery',
         'underscore': 'vendor/underscore-amd/underscore',
         'backbone': 'vendor/backbone-amd/backbone',
+        'localStorage': 'vendor/backbone.localStorage',
         'raphael': 'vendor/raphael/raphael',
         'eve': 'vendor/eve/eve',
         'async': 'vendor/async/lib',
@@ -17,7 +18,11 @@ require.config({
     }
 });
 
-require(['views/app', 'jquery'], function (AppView, $) {
+require([
+    'views/app',
+    'routers/Workspace',
+    'jquery', 
+    'backbone'], function (AppView, Workspace, $, Backbone) {
     $(document).ready(function () {
         var config = {
             el: $("#canvas-container"),
@@ -26,6 +31,9 @@ require(['views/app', 'jquery'], function (AppView, $) {
             nodeR: 20
         };
 
-        window.app = new AppView(config);
+        var app = window.app = new AppView(config);
+
+        new Workspace(app);
+        Backbone.history.start();
     });
 });

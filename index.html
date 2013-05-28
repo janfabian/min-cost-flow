@@ -2,19 +2,45 @@
 <html class="no-js">
     <head>
         <meta charset="utf-8">
-        <meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
-        <title>Min cost flow problem</title>
+        <title>Graphedit</title>
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width">
             
         <link href="css/screen.css" media="screen, projection" rel="stylesheet" type="text/css" />
-        <!-- 
-        <script src="js/vendor/live.js"></script>
-         -->
     </head>
     <body>
-        
-        <div id="canvas-container"></div>
+        <header>
+            <nav class="examples">
+                <h3>Examples</h3>
+                <ul>
+                    <li><a href="#example/1">Example 1</a></li>
+                    <li><a href="#example/2">Example 2</a></li>
+                    <li><a href="#example/3">Example 3</a></li>
+                </ul>
+                
+            </nav>
+            <aside class="help"> <a href="#help">?</a> </aside>
+            <aside class="tutorial"> <a href="#tutorial/1">Tutorial</a> </aside>
+            <h1>Graphedit</h1> 
+            <nav class="toolbar">
+                <ul>
+                    <li><a href="#save" action="save">Save</a></li>
+                    <li><a href="#load" action="load">Load</a></li>
+                </ul>
+            </nav>
+        </header>
+        <div id="canvas-container">
+        </div>
+        <section id="text">
+            <nav class="side">
+                <h4>Algorithms</h4>
+                <ul>
+                    <li><a href="#algorithms/mcf">Minimal Cost flow</a></li>
+                </ul>
+            </nav>
+            <article>            
+            </article>
+        </section>
         <script data-main="js/main" src="js/vendor/requirejs/require.js"></script>
     </body>
 </html>

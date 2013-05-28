@@ -1,18 +1,164 @@
 @import "normalize";
 @import "compass/css3/border-radius";
 @import "compass/css3/box-shadow";
+@import "compass/css3/box-sizing";
+@import "compass/css3/images";
+@import "compass/css3/inline-block";
 @import "compass/css3/text-shadow";
+@import "compass/css3/transition";
+@import "compass/typography/lists/inline-list";
 
 @include normalize;
 
-#canvas-container {
+@mixin container {
 	width: 1000px;
-	margin-top: 10px;
-	height: 500px;
 	margin-left: auto;
 	margin-right: auto;
+}
+
+body {
+	padding-bottom: 100px;
+}
+
+header {
+	@include container;
+	aside {
+		margin-right: 20px;
+		padding: 8px 20px;
+		background: rgba(black, .2);
+		@include border-radius(5px);
+		font-size: 2em;
+		float: right;
+		cursor: pointer;
+		a {
+			color: black;
+			text-decoration: none;
+		}
+		&.help:hover {
+			a:after {
+				content: "help";
+			}
+		}
+	}
+	nav.examples {
+		float: right;
+		h3 {
+			margin: 0 0 8px 0;
+			padding: 0;
+		}
+		&>ul {
+			margin: right;
+			@include inline-list();
+		}
+		li {
+			padding: 5px 8px !important;
+			background-color: rgba(orange, .2);
+			&:first-child {
+				@include border-radius(5px 0 0 5px);
+			}
+			&:last-child {
+				@include border-radius(0 5px 5px 0);
+			}
+			a {
+				color: rgba(black, .8);
+			}
+			&:hover {
+				@include transition(background-color 200ms linear);
+				background-color: orange;
+				a {
+					@include transition(color 200ms linear);
+					color: white;
+				}	
+			}
+		}
+	}
+}
+
+nav.toolbar {
+	position: absolute;
+	margin-left: -80px;
+	ul {
+		list-style-type: none;
+		padding: 0;
+		margin: 0;
+		a {
+			text-decoration: none;
+			display: block;
+			padding: 10px;
+			width: 50px;
+			text-align: center;
+			color: rgba(black, .8);
+			&[action='save']:before {
+				content: "\21D3";
+				margin-right: 2px;
+			}
+			&[action='load']:before {
+				content: "\21D1";
+				margin-right: 2px;
+			}
+		}
+		li {
+			background: rgba(orange, .2);
+			margin-bottom: 3px;
+			&:hover {
+				@include transition(background-color 200ms linear);
+				background-color: orange;
+				a {
+					@include transition(color 200ms linear);
+					color: white;
+				}	
+			}
+		}
+	}
+}
+
+#canvas-container {
+	@include container;
+	margin-top: 10px;
+	height: 500px;
 	border: 1px solid rgba(black, .5);
 	@include box-shadow(rgba(black, .5) 0 0 8px 0);
+}
+
+section#text {
+	margin-top: 30px;
+	margin-bottom: 30px;
+	overflow: auto;
+	@include container;
+	nav.side {
+		float: left;
+		width: 300px;
+		@include box-sizing(border-box);
+		h4 {
+			margin: 10px 0px;
+		}
+		ul {
+			list-style-type: none; 
+			a {
+				padding: 5px 10px;
+				color: black;
+				text-decoration: none;
+				// @include border-radius(5px);
+				// @include background-image(linear-gradient(#fefefe, #bbb)); 
+				// @include box-shadow(black 0 0 5px 0);
+				&:hover {
+					font-weight: bold;
+					// @include background-image(linear-gradient(#fefefe, #aaa)); 
+				}
+			}
+			li:before {
+				content: "\00BB \0020";
+			}
+		}
+	}
+	article {
+		width: 700px;
+		padding: 10px;
+		float: right;
+		border-left: 1px solid rgba(black, .7);
+		@include box-sizing(border-box);
+		line-height: 1.5em;
+	}
 }
 
 .editEdge {
@@ -40,4 +186,38 @@
 		width: 50%;
 		float: right;
 	}
+}
+
+.background-black {
+	content: "";
+	height: 100%;
+	width: 100%;
+	left: 0;
+	top: 0;
+	position: fixed;
+	z-index: 999;
+	background: rgba(black, .8);
+	cursor: pointer;
+}
+
+.modal-window {
+	background: white;
+	position: fixed;
+	width: 700px;
+	z-index: 1000;
+	padding: 30px;
+	@include box-sizing(border-box);
+	@include box-shadow(black 0 0 10px 0);
+	.close {
+		float: right;
+		background: rgba(black, .2);
+		padding: 3px 5px;
+		cursor: pointer;
+	}
+}
+
+span.code {
+	background: rgba(black, .2);
+	padding: 3px 5px;
+	font-family: 'Lucida Console', 'Bitstream Vera Sans Mono', 'Courier New', Monaco, Courier, monospace;
 }
