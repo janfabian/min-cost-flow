@@ -349,12 +349,12 @@ nav.toolbar ul a {
   color: rgba(0, 0, 0, 0.8);
 }
 /* line 91, ../sass/screen.scss */
-nav.toolbar ul a[action='save']:before {
+nav.toolbar ul a[href='#save']:before {
   content: "\21D3";
   margin-right: 2px;
 }
 /* line 95, ../sass/screen.scss */
-nav.toolbar ul a[action='load']:before {
+nav.toolbar ul a[href='#load']:before {
   content: "\21D1";
   margin-right: 2px;
 }

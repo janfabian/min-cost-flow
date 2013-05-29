@@ -88,11 +88,11 @@ nav.toolbar {
 			width: 50px;
 			text-align: center;
 			color: rgba(black, .8);
-			&[action='save']:before {
+			&[href='#save']:before {
 				content: "\21D3";
 				margin-right: 2px;
 			}
-			&[action='load']:before {
+			&[href='#load']:before {
 				content: "\21D1";
 				margin-right: 2px;
 			}
